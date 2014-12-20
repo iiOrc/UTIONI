@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import javax.swing.Icon;
+
 public class Command implements Runnable
 {
 	private boolean isTalking = true;
@@ -33,17 +35,21 @@ public class Command implements Runnable
 
 					} else
 					{
+						Icon icon = UTIONI.label.getIcon();
+
 						switch (s)
 						{
 							case "be quite":
 							case "please be quite":
 
 								UTIONI.walk.suspend();
+								UTIONI.label.setIcon(UTIONI.isStrait);
 
 								UTIONI.voice.speak("Very well.");
 
 								isTalking = false;
 
+								UTIONI.label.setIcon(icon);
 								UTIONI.walk.resume();
 
 								sleep();
@@ -53,9 +59,9 @@ public class Command implements Runnable
 							case "thanks a lot":
 
 								UTIONI.walk.suspend();
-
+								UTIONI.label.setIcon(UTIONI.isStrait);
 								UTIONI.voice.speak("You are welcome " + UTIONI.prefs.get("com.pointlight.koc.utioni.name", "user."));
-
+								UTIONI.label.setIcon(icon);
 								UTIONI.walk.resume();
 
 								sleep();
@@ -65,9 +71,9 @@ public class Command implements Runnable
 							case "you may speak now":
 
 								UTIONI.walk.suspend();
-
+								UTIONI.label.setIcon(UTIONI.isStrait);
 								UTIONI.voice.speak("Thank you.");
-
+								UTIONI.label.setIcon(icon);
 								UTIONI.walk.resume();
 
 								sleep();
@@ -77,6 +83,7 @@ public class Command implements Runnable
 							case "can you open my browser":
 
 								UTIONI.walk.suspend();
+								UTIONI.label.setIcon(UTIONI.isStrait);
 
 								if (Desktop.isDesktopSupported())
 								{
@@ -106,6 +113,7 @@ public class Command implements Runnable
 									}
 								}
 
+								UTIONI.label.setIcon(icon);
 								UTIONI.walk.resume();
 
 								sleep();
@@ -115,9 +123,11 @@ public class Command implements Runnable
 							default:
 
 								UTIONI.walk.suspend();
+								UTIONI.label.setIcon(UTIONI.isStrait);
 
 								UTIONI.voice.speak("I am sorry, I cannot process that request.");
 
+								UTIONI.label.setIcon(icon);
 								UTIONI.walk.resume();
 
 								sleep();

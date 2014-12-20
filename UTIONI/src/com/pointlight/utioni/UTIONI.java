@@ -29,15 +29,9 @@ import com.sun.speech.freetts.VoiceManager;
 
 public class UTIONI
 {
-	public static String projectDir = System.getProperty("user.dir") + "/bin/com/pointlight/utioni";
-	public static Preferences prefs = Preferences.userNodeForPackage(com.pointlight.utioni.Command.class);
-	public static JDialog window;
-	public static Voice voice;
-
 	private static URL left = UTIONI.class.getResource("/com/pointlight/utioni/assets/img/1.gif");
 	private static URL right = UTIONI.class.getResource("/com/pointlight/utioni/assets/img/2.gif");
-	private static Icon isLeft = new ImageIcon(left);
-	private static Icon isRight = new ImageIcon(right);
+	private static URL strait = UTIONI.class.getResource("/com/pointlight/utioni/assets/img/3.gif");
 	private static ImageIcon imageIcon;
 	private static Image image;
 	private static SystemTray sysTray;
@@ -47,9 +41,17 @@ public class UTIONI
 	private static MenuItem show;
 	private static TrayIcon trayIcon;
 	private static VoiceManager voiceManager;
-	private static JLabel label;
 	private static Thread speech;
 	public static Thread walk;
+
+	public static String projectDir = System.getProperty("user.dir") + "/bin/com/pointlight/utioni";
+	public static Preferences prefs = Preferences.userNodeForPackage(com.pointlight.utioni.Command.class);
+	public static JDialog window;
+	public static Voice voice;
+	public static JLabel label;
+	public static Icon isLeft = new ImageIcon(left);
+	public static Icon isRight = new ImageIcon(right);
+	public static Icon isStrait = new ImageIcon(strait);
 
 	public static void createWindow()
 	{
@@ -181,7 +183,7 @@ public class UTIONI
 				}
 			}
 		});
-		
+
 		walk.start();
 	}
 
@@ -207,13 +209,15 @@ public class UTIONI
 				{
 					e.printStackTrace();
 				}
-
+				
+				Icon icon = label.getIcon();
+				
 				walk.suspend();
-				
+				label.setIcon(isStrait);
 				voice.speak("hello " + UTIONI.prefs.get("com.pointlight.koc.utioni.name", "user") + ", welcome back, I am utioni.");
-
+				label.setIcon(icon);
 				walk.resume();
-				
+
 				new Thread(new Command()).start();
 			}
 		});
