@@ -6,7 +6,9 @@ import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
+import java.awt.Toolkit;
 import java.awt.TrayIcon;
+import java.awt.Window.Type;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -20,44 +22,63 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 
-public class UTIONI extends JDialog
+import com.sun.speech.freetts.Voice;
+import com.sun.speech.freetts.VoiceManager;
+
+public class UTIONI
 {
 	public static String projectDir = System.getProperty("user.dir") + "/bin/com/pointlight/utioni";
 	public static Preferences prefs = Preferences.userNodeForPackage(com.pointlight.utioni.Command.class);
+	public static JDialog window;
+	public static Voice voice;
 
-	private static final long serialVersionUID = 1L;
-	private static URL running = UTIONI.class.getResource("/com/pointlight/utioni/assets/img/1.gif");
-	private static URL talking = UTIONI.class.getResource("/com/pointlight/utioni/assets/img/2.gif");
-	private static Icon isRunning = new ImageIcon(running);
-	private static Icon isTalking = new ImageIcon(talking);
-	private ImageIcon imageIcon = new ImageIcon(ImageIO.read(getClass().getResourceAsStream("/com/pointlight/utioni/assets/img/1.gif")));
-	private Image image = imageIcon.getImage();
-	private SystemTray sysTray;
-	private PopupMenu menu;
-	private MenuItem quit;
-	private MenuItem hide;
-	private MenuItem show;
-	private TrayIcon trayIcon;
+	private static URL left = UTIONI.class.getResource("/com/pointlight/utioni/assets/img/1.gif");
+	private static URL right = UTIONI.class.getResource("/com/pointlight/utioni/assets/img/2.gif");
+	private static Icon isLeft = new ImageIcon(left);
+	private static Icon isRight = new ImageIcon(right);
+	private static ImageIcon imageIcon;
+	private static Image image;
+	private static SystemTray sysTray;
+	private static PopupMenu menu;
+	private static MenuItem quit;
+	private static MenuItem hide;
+	private static MenuItem show;
+	private static TrayIcon trayIcon;
+	private static VoiceManager voiceManager;
 	private static JLabel label;
 	private static Thread speech;
+	public static Thread walk;
 
-	public UTIONI() throws IOException
+	public static void createWindow()
 	{
+		window = new JDialog();
+
+		try
+		{
+			imageIcon = new ImageIcon(ImageIO.read(UTIONI.class.getResourceAsStream("/com/pointlight/utioni/assets/img/1.gif")));
+		}
+		catch (IOException e1)
+		{
+			e1.printStackTrace();
+		}
+
+		image = imageIcon.getImage();
+
 		label = new JLabel();
 
-		label.setIcon(isRunning);
+		label.setIcon(isRight);
 
-		setType(Type.UTILITY);
-		setSize(64, 64);
-		setLocation(0, 0);
-		setResizable(false);
-		setUndecorated(true);
-		setAlwaysOnTop(true);
-		setBackground(new Color(0, 0, 0, 1));
-		add(label);
-		pack();
-		setVisible(true);
+		window.setType(Type.UTILITY);
+		// window.setResizable(false);
+		window.setUndecorated(true);
+		window.setAlwaysOnTop(true);
+		window.setBackground(new Color(0, 0, 0, 1));
+		window.add(label);
+		window.pack();
+		window.setLocation(0, 0);
+		window.setVisible(true);
 
 		speech.start();
 
@@ -88,7 +109,7 @@ public class UTIONI extends JDialog
 				@Override
 				public void actionPerformed(ActionEvent e)
 				{
-					setVisible(false);
+					window.setVisible(false);
 
 					menu.add(show);
 					menu.remove(hide);
@@ -100,7 +121,7 @@ public class UTIONI extends JDialog
 				@Override
 				public void actionPerformed(ActionEvent e)
 				{
-					setVisible(true);
+					window.setVisible(true);
 
 					menu.add(hide);
 					menu.remove(show);
@@ -118,38 +139,92 @@ public class UTIONI extends JDialog
 				System.out.println(e.getMessage());
 			}
 		}
+
+		walk = new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				while (true)
+				{
+					for (int i = 0; i < Toolkit.getDefaultToolkit().getScreenSize().width; i++)
+					{
+						window.setLocation(window.getLocation().x + 1, 0);
+
+						try
+						{
+							Thread.sleep(200);
+						}
+						catch (InterruptedException e)
+						{
+							e.printStackTrace();
+						}
+					}
+
+					label.setIcon(isLeft);
+
+					for (int i = 0; i < Toolkit.getDefaultToolkit().getScreenSize().width; i++)
+					{
+						window.setLocation(window.getLocation().x - 1, 0);
+
+						try
+						{
+							Thread.sleep(200);
+						}
+						catch (InterruptedException e)
+						{
+							e.printStackTrace();
+						}
+					}
+
+					label.setIcon(isRight);
+				}
+			}
+		});
+		
+		walk.start();
 	}
 
 	public static void main(String[] args)
 	{
 		speech = new Thread(new Runnable()
 		{
+			@SuppressWarnings("deprecation")
 			@Override
 			public void run()
 			{
-				System.out.println(projectDir);
+				System.setProperty("mbrola.base", projectDir + "/assets/mbrola");
+
+				voiceManager = VoiceManager.getInstance();
+				voice = voiceManager.getVoice("mbrola_us1");
+				voice.allocate();
+
 				try
 				{
-					voce.SpeechInterface.init(projectDir, true, true, new File(projectDir + "/assets/gram").toURI().toURL().toString(), "main");
+					voce.SpeechInterface.init(projectDir, false, true, new File(projectDir + "/assets/gram").toURI().toURL().toString(), "main");
 				}
 				catch (MalformedURLException e)
 				{
 					e.printStackTrace();
 				}
 
-				voce.SpeechInterface.synthesize("hello " + UTIONI.prefs.get("com.pointlight.koc.utioni.name", "user") + ", welcome back.");
+				walk.suspend();
+				
+				voice.speak("hello " + UTIONI.prefs.get("com.pointlight.koc.utioni.name", "user") + ", welcome back, I am utioni.");
 
+				walk.resume();
+				
 				new Thread(new Command()).start();
 			}
 		});
 
-		try
+		SwingUtilities.invokeLater(new Runnable()
 		{
-			new UTIONI();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+			@Override
+			public void run()
+			{
+				createWindow();
+			}
+		});
 	}
 }

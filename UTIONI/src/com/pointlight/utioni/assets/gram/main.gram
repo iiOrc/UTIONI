@@ -1,0 +1,12 @@
+#JSGF V1.0;
+
+/*@author Justin Cameron*/
+
+grammar com.pointlight.utioni.gram.main;
+
+public <greeting> = (thank you);
+public <command> = (<prefix> * open <program> | start calling me by the name <name>);
+<prefix> = (please | can you);
+<name> = (justin);
+<program> = (my browser);
+public <status> = (<prefix> * be quite | you may speak now);
