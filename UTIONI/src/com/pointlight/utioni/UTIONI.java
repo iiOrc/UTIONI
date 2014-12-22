@@ -34,12 +34,6 @@ public class UTIONI
 	private static URL strait = UTIONI.class.getResource("/com/pointlight/utioni/assets/img/3.gif");
 	private static ImageIcon imageIcon;
 	private static Image image;
-	private static SystemTray sysTray;
-	private static PopupMenu menu;
-	private static MenuItem quit;
-	private static MenuItem hide;
-	private static MenuItem show;
-	private static TrayIcon trayIcon;
 	private static VoiceManager voiceManager;
 	private static Thread speech;
 	public static Thread walk;
@@ -86,12 +80,12 @@ public class UTIONI
 
 		if (SystemTray.isSupported())
 		{
-			sysTray = SystemTray.getSystemTray();
-			menu = new PopupMenu();
+			SystemTray sysTray = SystemTray.getSystemTray();
+			PopupMenu menu = new PopupMenu();
 
-			quit = new MenuItem("quit");
-			hide = new MenuItem("hide");
-			show = new MenuItem("show");
+			MenuItem quit = new MenuItem("quit");
+			MenuItem hide = new MenuItem("hide");
+			MenuItem show = new MenuItem("show");
 
 			menu.add(quit);
 			menu.add(hide);
@@ -130,7 +124,7 @@ public class UTIONI
 				}
 			});
 
-			trayIcon = new TrayIcon(image, "UTIONI", menu);
+			TrayIcon trayIcon = new TrayIcon(image, "UTIONI", menu);
 
 			try
 			{
@@ -184,6 +178,7 @@ public class UTIONI
 			}
 		});
 
+		walk.setName("movement");
 		walk.start();
 	}
 
@@ -209,9 +204,9 @@ public class UTIONI
 				{
 					e.printStackTrace();
 				}
-				
+
 				Icon icon = label.getIcon();
-				
+
 				walk.suspend();
 				label.setIcon(isStrait);
 				voice.speak("hello " + UTIONI.prefs.get("com.pointlight.koc.utioni.name", "user") + ", welcome back, I am utioni.");
